@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables file
+.env
+.env.*
+
+# Mac system files
+.DS_Store
+
+# VSCode settings
+.vscode/
+
+# Misc
+*.log
