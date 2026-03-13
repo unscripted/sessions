@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "sessions",
+  "description": "Session continuity tools for Claude Code — start, update, end, and query work sessions.",
+  "owner": {
+    "name": "Cullen Whitmore"
+  },
+  "plugins": [
+    {
+      "name": "session",
+      "description": "Session continuity commands. Load context at session start, checkpoint during work, wrap up at end of day, and query session history.",
+      "version": "2.3.0",
+      "author": {
+        "name": "Cullen Whitmore"
+      },
+      "source": "./plugins/session",
+      "category": "productivity",
+      "strict": false
+    }
+  ]
+}
