@@ -1,59 +1,74 @@
 ---
-description: Mid-session checkpoint. Captures recent progress and updates CURRENT.md without writing a full dated archive. Run after completing something meaningful or before stepping away briefly.
-allowed-tools: Read, Write, Bash(date:*), Bash(mkdir:*)
+description: Checkpoint the current session. Summarizes everything accomplished since the last timestamp and appends it to the session file.
+allowed-tools: Read, Write, Bash(date:*), Bash(ls:*), Bash(mkdir:*)
 ---
 
 ## Context
 
 Current date: !`date +%Y-%m-%d`
+Current time: !`date +%H:%M`
 
-Current session file:
-!`cat docs/sessions/CURRENT.md 2>/dev/null || echo "NO_CURRENT_FILE"`
+Most recent session file:
+!`ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r | head -1 || echo "NO_FILES"`
+
+Contents of most recent session file:
+!`cat $(ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r | head -1) 2>/dev/null || echo "NO_CONTENT"`
 
 ## Your task
 
-Look back at this conversation and identify what has been accomplished since the last checkpoint (or since the session started if this is the first update).
+### Step 1: Guard
 
-**What to capture:**
-- Specific things completed: files created or modified, features implemented, bugs fixed, decisions made
-- Any blockers or open questions that surfaced
-- Updated next steps based on where things stand now
+If there are no session files (`NO_FILES`), stop and say:
+"No sessions found. Run `/session:new` to start one."
 
-**Then update `docs/sessions/CURRENT.md`** — rewrite the file using this structure, preserving "What We're Building" unless it changed:
+### Step 2: Determine the target file
 
-```
-# Current Context
+**If the most recent file is today's date** — append to it. Find the most recent timestamp line (a line containing `started at` or `resumed at`) — that marks where the current session began. Summarize everything in the conversation since that point.
 
-_Last updated: YYYY-MM-DD_
+**If the most recent file is a previous date** — create `docs/sessions/YYYY-MM-DD.md` for today. Summarize the full current conversation (no starting timestamp, since session:new was not run).
 
-## What We're Building
+### Step 3: Build the summary
 
-[keep existing unless it changed]
+Look back at the conversation since the last timestamp and extract:
 
-## Last Session (YYYY-MM-DD)
+- **Accomplished** — specific things completed: files created or modified, decisions made, bugs fixed, features shipped. "Added rate limiting to `src/api/upload.ts`" not "worked on the API."
+- **Key Decisions** — choices made and why (table format)
+- **Blockers / Open Questions** — anything unresolved or unclear
+- **Commits Made** - list with the commit hash and subject line of each commit made during the working session
+- **Next Steps** — what to pick up next; replace entirely with the current best understanding
 
-### Accomplished
+### Step 4: Append the block
 
-[merge prior accomplishments + what was just done in this conversation]
+Append to the target file:
+
+```markdown
+---
+
+### Accomplished (HH:MM – HH:MM)
+
+- [specific item]
+- [specific item]
 
 ### Key Decisions
 
-[keep prior decisions, add any new ones]
+| Decision | Choice | Rationale |
+| -------- | ------ | --------- |
+| ...      | ...    | ...       |
 
 ### Blockers / Open Questions
 
-[updated list]
+- [item]
 
-## Next Steps (pick up here)
+### Commits
 
-1. [most immediate next action — specific enough to act on without re-reading the conversation]
-2. ...
-3. ...
+- [hash] [Subject]
+
+### Next Steps
+
+1. [specific, actionable item]
+2. [specific, actionable item]
 ```
 
-**Rules:**
-- Be specific: "Added rate limiting to `src/api/upload.ts`" not "worked on the API"
-- Next steps must be actionable: "Implement retry logic in `fetchUser()`" not "continue working on fetch"
-- This is a lightweight update — don't write a dated archive file, just refresh CURRENT.md
+Use the start time from the most recent session marker and the current time as the end time.
 
-Confirm when done: "CURRENT.md updated with latest progress."
+Confirm: "Session updated at HH:MM."

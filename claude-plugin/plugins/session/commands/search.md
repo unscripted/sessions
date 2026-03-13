@@ -8,13 +8,13 @@ allowed-tools: Read, Bash(ls:*), Bash(date:*)
 Current date: !`date +%Y-%m-%d`
 
 Available session files:
-!`ls docs/sessions/*.md 2>/dev/null | grep -v CURRENT.md | sort -r || echo "NO_SESSION_FILES"`
+!`ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r || echo "NO_SESSION_FILES"`
 
 ## Your task
 
 ### If no session files exist
 
-Tell the user there's no session history yet and suggest running `/session:end` at the end of today's work to create the first entry.
+Tell the user there's no session history yet and suggest running `/session:new` to start the first session and `/session:update` to save progress.
 
 ### If no search term was provided
 

@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Bash(ls:*), Bash(mkdir:*), Bash(git log:*), Bash(git
 Current date: !`date +%Y-%m-%d`
 
 Already initialized?
-!`ls docs/sessions/CURRENT.md 2>/dev/null && echo "YES" || echo "NO"`
+!`ls docs/sessions/ > /dev/null 2>&1 && echo "YES" || echo "NO"`
 
 Existing CLAUDE.md:
 !`cat CLAUDE.md 2>/dev/null || echo "NO_CLAUDE_MD"`
@@ -29,8 +29,8 @@ Recent files changed:
 
 ### Step 1: Check if already initialized
 
-If `docs/sessions/CURRENT.md` already exists, stop and say:
-"Session tracking is already initialized. Run `/start-session` to load your current context."
+If `docs/sessions/` already exists, stop and say:
+"Session tracking is already initialized. Run `/session:new` to start a session or `/session:resume` to pick up where you left off."
 
 ### Step 2: Determine the scenario
 
@@ -38,13 +38,13 @@ Use the context above to classify:
 
 **A — Brand new project**: No CLAUDE.md, no README with real content, no git history (or just an initial commit). Nothing to infer from.
 
-**B — New project with existing CLAUDE.md**: Has a CLAUDE.md (meaning AI context has been set up) but no session history. Can infer intent from CLAUDE.md and README.
+**B — New project with existing CLAUDE.md**: Has a CLAUDE.md but no session history. Can infer intent from CLAUDE.md and README.
 
 **C — Established project**: Has meaningful git history, a populated README, or a CLAUDE.md with real content. Sessions is being added to an ongoing project.
 
 ### Step 3: Gather missing context (Scenario A only)
 
-For a brand new project where there's nothing to infer from, ask the user:
+For a brand new project, ask the user:
 - "What are you building?" (a sentence or two — purpose and tech stack)
 - "What's the first thing you're working on?"
 
@@ -54,79 +54,67 @@ Wait for their response before proceeding. Don't write any files yet.
 
 Run `mkdir -p docs/sessions` to create the directory.
 
-### Step 5: Write CURRENT.md
+### Step 5: Seed the first session file (Scenario C only)
 
-**Scenario A** (new, from user's answers):
+For established projects, create `docs/sessions/YYYY-MM-DD.md` with an inferred summary of recent work so the history isn't empty:
+
 ```markdown
-# Current Context
+# YYYY-MM-DD
 
-_Last updated: YYYY-MM-DD_
+Session history initialized
 
-## What We're Building
+### What We're Building
 
-[user's description]
+[synthesized from README and codebase — 1–2 sentences]
 
-## Last Session (YYYY-MM-DD)
+### Recent Work (inferred from git history)
 
-### Accomplished
+- [grouped summary of recent commits — not a raw list]
 
-- Initialized session tracking
+### Key Decisions (inferred)
 
-### Key Decisions
+| Decision | Choice | Rationale |
+| -------- | ------ | --------- |
+| ...      | ...    | ...       |
 
-- [none yet]
+### Open Questions
 
-### Blockers / Open Questions
-
-- [none yet]
-
-## Next Steps (pick up here)
-
-1. [user's first task]
+- [anything that looks in-progress or TODO in recent changes]
 ```
 
-**Scenario B** (inferred from CLAUDE.md/README):
-Draft a CURRENT.md using what you can read from the existing files. Synthesize — don't just copy. Make a reasonable attempt at "What We're Building" and leave Next Steps for the user to fill in. After writing, show the user what you wrote and ask: "Does this look right, or anything to adjust?"
+Show the user what you drafted and say: "I've inferred this from your codebase — adjust anything that's off."
 
-**Scenario C** (established project):
-This is the most valuable case. Read the git history, README, and any relevant source files to build an informed first draft:
-- **What We're Building**: synthesize from README and codebase
-- **Accomplished**: last 1–2 weeks of meaningful work from git log (group related commits, not a raw list)
-- **Key Decisions**: anything inferrable from the codebase or README (tech choices, architecture patterns)
-- **Blockers / Open Questions**: anything that looks in-progress or TODO in recent changes
-- **Next Steps**: infer from recent git activity and any TODO/FIXME in recent files
-
-After writing, show the user what you drafted and say: "I've inferred this from your codebase — adjust anything that's off."
+For Scenarios A and B, leave the daily file for `/session:new` to create when the user starts their first session.
 
 ### Step 6: Update CLAUDE.md
 
 **If CLAUDE.md doesn't exist**, create it with just the sessions section:
+
 ```markdown
 ## Session Tracking
 
 This project uses session files to maintain context across conversations.
 
-- **Load context**: `/start-session` at the beginning of each conversation
-- **Checkpoint**: `/update-session` after completing something or before stepping away
-- **Wrap up**: `/end-session` at the end of the day
-- **Search history**: `/session-log <topic>` to find past decisions
+- **New session**: `/session:new` — start fresh with no prior context
+- **Resume**: `/session:resume` — pick up where you left off
+- **Checkpoint**: `/session:update` — save progress mid-session
+- **Search history**: `/session:search` — find past decisions
 
-Context lives in `docs/sessions/CURRENT.md`. Session archive in `docs/sessions/`.
+Session files live in `docs/sessions/YYYY-MM-DD.md`.
 ```
 
-**If CLAUDE.md already exists**, append the same section at the end (don't modify existing content).
+**If CLAUDE.md already exists**, append the same section at the end.
 
 ### Step 7: Confirm
 
-Report what was created:
 ```
 Session tracking initialized.
 
 Created:
-  docs/sessions/CURRENT.md
+  docs/sessions/
 
 Updated:
   CLAUDE.md  (added Session Tracking section)
 
-Run `/start-session` to begin your first session.
+Run `/session:new` to start your first session.
 ```

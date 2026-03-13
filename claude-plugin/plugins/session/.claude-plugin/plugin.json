@@ -1,6 +1,6 @@
 {
   "name": "session",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "Session continuity commands for Claude Code. Load context at the start, checkpoint during, and wrap up at the end of each work session.",
   "author": {
     "name": "Cullen Whitmore"
