@@ -11,8 +11,10 @@ Current time: !`date +%H:%M`
 Available session files (most recent first):
 !`ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r || echo "NO_FILES"`
 
-Most recent session file contents:
-!`cat $(ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r | head -1) 2>/dev/null || echo "NO_CONTENT"`
+Most recent session file:
+!`ls docs/sessions/[0-9]*.md 2>/dev/null | sort -r | head -1 || echo "NO_FILES"`
+
+Use the Read tool to read the contents of that file before proceeding.
 
 ## Your task
 
